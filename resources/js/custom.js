@@ -10,6 +10,15 @@ $('#userEditModal').on('shown.bs.modal', function(event) {
     modal.find('#userEditRole').val(user.role);
 });
 
+$('#addTaskModal').on('shown.bs.modal', function(event) {
+    let button = $(event.relatedTarget); // Button that triggered the modal
+    let task = button.data('task');
+    console.log('asdasd',$('#changeBoard').val())
+    let modal = $(this);
+
+    modal.find('#board_id').val(task.name);
+});
+
 $('#userEditModalAjax').on('shown.bs.modal', function(event) {
     let button = $(event.relatedTarget); // Button that triggered the modal
     let user = button.data('user');
@@ -123,6 +132,81 @@ $(document).ready(function() {
         let id = $(this).val();
 
         window.location.href = '/board/' + id;
+    });
+
+    $('#addBoardUsers').select2();
+
+    $('#addBoard').on('click', function() {
+        $('#addBoardAlert').addClass('hidden');
+
+        let name = $('#name').val();
+        let boardUsersData = $('#addBoardUsers').select2('data');
+
+        let boardUsers = [];
+
+        boardUsersData.forEach(function(item) {
+            boardUsers.push(item.id);
+        });
+
+        $.ajax({
+            method: 'POST',
+            url: '/board/add',
+            data: {name: name,boardUsersIds: boardUsers},
+            success:function(response) {
+                window.location.reload();
+            },
+            error: function (err) {
+                if (err.status == 422) { // when status code is 422, it's a validation issue
+                    console.log(err.responseJSON);
+                    $('#addBoardAlert').fadeIn().html(err.responseJSON.message);
+
+                    // display errors on each form field
+                    $.each(err.responseJSON.errors, function (i, error) {
+                        var el = $(document).find('[name="'+i+'"]');
+                        el.after($('<span style="color: red;">'+error[0]+'</span>'));
+                    });
+                }
+            }
+        })
+
+    });
+
+    $('#addTask').on('click', function() {
+        $('#addTaskAlert').addClass('hidden');
+
+        let name = $('#addTaskName').val();
+        let board_id = $('#changeBoard').val();
+        let description = $('#addTaskDescription').val();
+        let assignment = $('#addTaskAssignment').val();
+        let status = $('#addTaskStatus').val();
+
+        $.ajax({
+            method: 'POST',
+            url: '/task/add',
+            data: {
+                name: name,
+                board_id: board_id,
+                description: description,
+                assignment: assignment,
+                status: status
+            },
+            success:function(response) {
+                window.location.reload();
+            },
+            error: function (err) {
+                if (err.status == 422) { // when status code is 422, it's a validation issue
+                    console.log(err.responseJSON);
+                    $('#addTaskAlert').fadeIn().html(err.responseJSON.message);
+
+                    // display errors on each form field
+                    $.each(err.responseJSON.errors, function (i, error) {
+                        var el = $(document).find('[name="'+i+'"]');
+                        el.after($('<span style="color: red;">'+error[0]+'</span>'));
+                    });
+                }
+            }
+        })
+
     });
 
     $('#boardEditUsers').select2();

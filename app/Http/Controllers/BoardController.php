@@ -42,7 +42,7 @@ class BoardController extends Controller
             });
         }
 
-        $boards = $boards->paginate(10);
+        $boards = $boards->orderBy('created_at','DESC')->paginate(10);
 
         return view(
             'boards.index',
@@ -168,7 +168,7 @@ class BoardController extends Controller
             return redirect()->route('boards.all');
         }
 
-        $tasks = $board->tasks()->oldest()->paginate(10);
+        $tasks = $board->tasks()->orderBy('created_at', 'DESC')->paginate(10);
 
         $boardUsers = $board->boardUsers()->with('user')->get();
 
@@ -251,4 +251,64 @@ class BoardController extends Controller
 
         return response()->json(['error' => $error, 'success' => $success]);
     }
+
+    public function addBoard(Request $request): RedirectResponse
+    {
+
+        if ($request->isMethod('post')) {
+            $this->validate(request(), [
+                'name' => 'required',
+            ]);
+
+            $data = [
+                'name' => $request->get('name'),
+                'user_id' => Auth::id(),
+            ];
+
+            $board = Board::create($data);
+
+            foreach ($request->get('boardUsersIds') as $id){
+                BoardUser::create([
+                    'user_id' => $id,
+                    'board_id' => $board->id
+                ]);
+            }
+
+            $success = 'Board added!';
+
+            return redirect()->back()->with(['success' => $success]);
+        }
+        $error = 'Error!';
+
+        return redirect()->back()->with(['error' => $error]);
+    }
+
+    public function addTask(Request $request): RedirectResponse
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => 'required',
+                'description' => 'required'
+            ]);
+
+            $data = [
+                'name' => $request->get('name'),
+                'board_id' => $request->get('board_id'),
+                'description' => $request->get('description'),
+                'assignment' => $request->get('assignment'),
+                'status' => '0',
+            ];
+
+            Task::create($data);
+
+            $success = 'Task created!';
+
+            return redirect()->back()->with(['success' => $success]);
+        }
+
+        $error = 'Error!';
+
+        return redirect()->back()->with(['error' => $error]);
+    }
+
 }

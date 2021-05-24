@@ -42,7 +42,28 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Task list</h3>
+
+                <div class="float-right">
+                    <div class="btn-group">
+                        <button class="btn btn-block btn-primary"
+                                type="button"
+                                data-toggle="modal"
+                                data-task="{{json_encode($board)}}"
+                                data-target="#addTaskModal">
+                            Add Task
+                        </button>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        @if (session('success'))
+            <div class="alert alert-success" role="alert">{{session('success')}}</div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger" role="alert">{{session('error')}}</div>
+        @endif
 
             <div class="card-body">
                 <table class="table table-bordered">
@@ -128,6 +149,49 @@
             </div>
         </div>
         <!-- /.card -->
+
+        <div class="modal fade" id="addTaskModal">
+            <div class="modal-dialog">
+                <form action="{{route('add.task')}}" method="POST">
+                    @csrf
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Add Task</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-danger hidden" id="addTaskAlert"></div>
+                            <div class="form-group">
+                                <label for="addTaskName">Name</label>
+                                <input type="text" class="form-control" name="name" id="addTaskName" required placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="addTaskDescription">Description</label>
+                                <textarea class="form-control" name="description" id="addTaskDescription"  placeholder="Description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="addTaskAssignment">Assignment</label>
+                                <select class="custom-select rounded-0" id="addTaskAssignment">
+                                    <option value="">Unassigned</option>
+                                    @foreach ($boardUsers as $boardUser)
+                                        <option value="{{$boardUser->user_id}}">{{$boardUser->user->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <input type="hidden" name="addTaskStatus" id="addTaskStatus"/>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="addTask">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
 
         <div class="modal fade" id="taskEditModal">
             <div class="modal-dialog">

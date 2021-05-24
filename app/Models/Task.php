@@ -43,6 +43,13 @@ class Task extends Model
     const STATUS_IN_PROGRESS = 1;
     const STATUS_DONE = 2;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'assignment',
+        'status',
+        'board_id'
+    ];
     /** @var string */
     protected $table = 'tasks';
 

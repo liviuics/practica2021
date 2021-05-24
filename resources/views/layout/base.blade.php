@@ -8,12 +8,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
-
+        <script src="https://kit.fontawesome.com/04abf91baa.js" crossorigin="anonymous"></script>
+        <!-- Styles -->
+        <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
-
         <!-- Styles -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
     </head>
 
     @yield('body')
